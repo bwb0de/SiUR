@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-testes add
+    siur-testes list
+    siur-testes run [ <fichas> ]
+
+Options:
+    --version
+
+"""
+
+import os
+
+from docopt import docopt
+from modules.siur_action_register import Teste
+from modules.siur_action_test import calcular_percentual_base
+from modules.siur_pastas_de_dados import pasta_testes, pasta_protagonistas
+from modules.py_pickle_handlers import read_pickle, show_data_folder, return_object_info_and_location_list, load_selected_pickle_ob
+from modules.cli_tools import list_col_responses, dict_from_table, select_op
+
+
+args = docopt(__doc__)
+
+
+def main():
+    if args['add']:
+        Teste(input("Teste a ser registrado: "))
+    
+    elif args['list']:
+        testes = return_object_info_and_location_list(pasta_testes)
+        testes = list(list_col_responses(testes, col_num=1, delimitor=';'))
+        for teste in testes:
+            teste_obj = read_pickle(teste, pasta_testes)
+            print(teste_obj.info())
+    
+    elif args['run']:
+        fichas = int(args['<fichas>'])
+        protagonista = next(load_selected_pickle_ob("Selecione um protagonista:", pasta_protagonistas))
+        teste = next(load_selected_pickle_ob("Selecione a ação realizada:", pasta_testes))
+        print(calcular_percentual_base(protagonista, teste, magnitude_sucesso_parcial=5*fichas))
+
+        
+
+
+
+
+
+if __name__ == '__main__':
+	main()

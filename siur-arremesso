@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-arremesso info
+    siur-arremesso check
+    siur-arremesso best
+
+Options:
+    --version
+
+"""
+
+import random
+
+from docopt import docopt
+from modules.siur_arremesso import show_stats, calculate_maxang, calculate_best_ang
+from modules.cli_tools import input_num, verde, vermelho
+from modules.py_pickle_handlers import load_selected_pickle_ob
+from modules.siur_pastas_de_dados import pasta_protagonistas
+
+args = docopt(__doc__)
+
+def main():
+    if args['info']:
+        protagonista = load_selected_pickle_ob('Selecione o protagonista:', pasta_protagonistas)
+        indice_arremesso = protagonista.capacidades_secundarias['Arremesso']
+        massa = input_num('Indique a massa do objeto arremessado (g)', random.randint(120,198))
+        angulo = input_num('Indique o ângulo de arremesso', 45)
+        raio_projetil = input_num('Indique o raio do projétil (m)', 0.033)
+        distancia_do_alvo = input_num('Indique a distância do alvo (m)')
+        show_stats(indice_arremesso, massa, angulo, raio=raio_projetil, distancia_do_alvo=distancia_do_alvo)
+    
+    elif args['check']:
+        protagonista = load_selected_pickle_ob('Selecione o protagonista:', pasta_protagonistas)
+        indice_arremesso = protagonista.capacidades_secundarias['Arremesso']
+        massa = input_num('Indique a massa do objeto arremessado (g)', random.randint(120,198))
+        altura_limite = input_num('Indique a altura limite do arremesso (m)', 4)
+        distancia_do_alvo = input_num('Indique a distância do alvo (m)')
+        maxang = calculate_maxang(indice_arremesso, massa, altura_limite)
+        bestang = calculate_best_ang(indice_arremesso, massa, distancia_do_alvo)
+        try:
+            if bestang <= maxang:
+                print(verde('Arremesso possível...'))
+            else:
+                print(vermelho('Arremesso impossível... Projétil bate no teto...'))
+        except TypeError:
+            print(vermelho('Arremesso impossível... Alvo distante...'))
+
+
+    elif args['best']:
+        protagonista = load_selected_pickle_ob('Selecione o protagonista:', pasta_protagonistas)
+        indice_arremesso = protagonista.capacidades_secundarias['Arremesso']    
+
+if __name__ == '__main__':
+	main()

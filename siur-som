@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-som play ( bg | fx ) [ <filename> ]
+    siur-som stop
+
+
+Options:
+    --version
+
+"""
+
+import os
+import vlc
+from time import sleep
+
+from docopt import docopt
+from modules.siur_pastas_de_dados import pasta_sons_de_fundo, pasta_sons_fx
+from modules.siur_sound import play_bgsnd, stop_bgsnd, play_fxsnd, select_snd
+from modules.cli_tools import pick_options, write_to_file, read_from_file
+
+args = docopt(__doc__)
+
+def main():
+    if args['play']:
+        if args['bg']:
+            pasta = pasta_sons_de_fundo
+            play_function = play_bgsnd
+
+        elif args['fx']:
+            pasta = pasta_sons_fx
+            play_function = play_fxsnd
+  
+        if args['<filename>']:
+            selected_snd = args['<filename>']
+        else:
+            selected_snd = select_snd(pasta)
+
+        play_function(selected_snd, filefolder=pasta)
+
+
+    elif args['stop']:
+            stop_bgsnd()
+
+
+
+if __name__ == '__main__':
+    main()

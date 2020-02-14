@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa de auxílio aos mestres de RPG para gestão de aspectos dos personagens, cenas e combate
+
+Usage:
+    siur
+
+Options:
+    --version
+
+"""
+
+import os
+
+from docopt import docopt
+
+from modules.cli_tools import select_op, azul_claro, list_folder
+from modules.py_pickle_handlers import return_object_info_and_location_list
+from modules.siur_pastas_de_dados import \
+    pasta_testes,\
+    pasta_equipamentos,\
+    pasta_especialidades,\
+    pasta_protagonistas,\
+    pasta_antagonistas,\
+    pasta_criaturas,\
+    pasta_figurantes,\
+    pasta_cenas,\
+    pasta_cenarios,\
+    pasta_armaduras,\
+    pasta_armas_brancas,\
+    pasta_armas_de_fogo
+
+args = docopt(__doc__)
+
+def minimal_info_check():
+    itens_cenarios = list_folder(pasta_cenarios)
+    itens_cenas = list_folder(pasta_cenas)
+    itens_especialidades = list_folder(pasta_especialidades)
+    itens_protagonistas = list_folder(pasta_protagonistas)
+    itens_antagonistas = list_folder(pasta_antagonistas)
+    itens_criaturas = list_folder(pasta_criaturas)
+    itens_figurantes = list_folder(pasta_figurantes)
+    itens_armaduras = list_folder(pasta_armaduras)
+    itens_armas_brancas = list_folder(pasta_armas_brancas)
+    itens_armas_de_fogo = list_folder(pasta_armas_de_fogo)
+    itens_testes = list_folder(pasta_testes)
+    
+    if not itens_cenarios:
+        print('É necessário criar cenários antes de prosseguir... Digite: "siur-cenarios add; siur-cenarios set <cenario>".')
+        exit()
+    elif not itens_antagonistas:
+        print('É necessário criar Antagonistas antes de prosseguir... Digite: "siur-personagens add".')
+        exit()
+    elif not itens_cenas:
+        print('É necessário criar cenas antes de prosseguir... Digite: "siur-cenas add".')
+        exit()
+    elif not itens_especialidades:
+        print('É necessário definir especialidades antes de prosseguir... Digite: "siur-especialidades add".')
+        exit()
+    elif not itens_protagonistas:
+        print('É necessário criar Protagonistas antes de prosseguir... Digite: "siur-personagens add".')
+        exit()
+    elif not itens_criaturas:
+        print('É necessário criar Criaturas antes de prosseguir... Digite: "siur-personagens add".')
+        exit()
+    elif not itens_figurantes:
+        print('É necessário criar Figurantes antes de prosseguir... Digite: "siur-cenarios add".')
+        exit()
+    elif not itens_armaduras:
+        print('É necessário definir armaduras antes de prosseguir... Digite: "siur-equipamento add".')
+        exit()
+    elif not itens_armas_brancas:
+        print('É necessário definir armas brancas antes de prosseguir... Digite: "siur-equipamento add".')
+        exit()
+    elif not itens_armas_de_fogo:
+        print('É necessário definir armas de fogo antes de prosseguir... Digite: "siur-equipamento add".')
+        exit()
+    elif not itens_testes:
+        print('É necessário registrar testes antes de prosseguir... Digite: "siur-testes add".')
+        exit()
+
+
+
+def menu_principal():
+    opcoes = [
+        'Personagens',\
+        'Locais',\
+        'Combate',\
+        'Sair do programa']
+
+    while True:
+        op = select_op(opcoes, 1, input_label='MENU PRINCIPAL', clear_screen=True)[0]
+
+        if op == 'Personagens':
+            menu_personagens()
+        
+        elif op == 'Locais':
+            menu_cenarios()
+
+        elif op == 'Combate':
+            menu_combate()
+
+        elif op == 'Sair do programa':
+            break
+
+
+def menu_personagens():
+    opcoes = [
+        'Escolher personagem alvo',\
+        'Ver informações do personagem alvo',\
+        'Modificar marcadores do personagem alvo',\
+        'Pegar itens do cenário',\
+        'Pegar recursos do cenário',\
+        'Comprar itens de loja abstrata',\
+        'Comprar itens de loja concreta, é necessário criar um local e definí-lo como presente',\
+        'Passar itens do inventário à outro personagem',\
+        'Deixar itens no presente local',\
+        'Vender itens',\
+        'Menu principal'
+        ]
+
+    while True:
+        op = select_op(opcoes, 1, input_label='MENU PERSONAGENS', clear_screen=True)[0]
+
+        if op == 'Escolher personagem alvo':
+            os.system('./siur-players set')
+
+        if op == 'Ver informações do personagem alvo':
+            os.system('./siur-players ?')
+            input()
+
+        if op == 'Modificar marcadores do personagem alvo':
+            os.system('./siur-players edit')
+
+        if op == 'Pegar itens do cenário':
+            os.system('./siur-players get item')
+
+        if op == 'Pegar recursos do cenário':
+            os.system('./siur-players get $')
+
+        if op == 'Comprar itens de loja abstrata':
+            os.system('./siur-players buy')
+
+        if op == 'Comprar itens de loja concreta, é necessário criar um local e definí-lo como presente':
+            pass
+            #os.system('./siur-players ')
+            #Regra não definida
+
+        if op == 'Passar itens do inventário à outro personagem':
+            os.system('./siur-players give')
+
+        if op == 'Deixar itens no presente local':
+            os.system('./siur-players save')
+            os.system('./siur-players drop from-body')
+
+        if op == 'Vender itens':
+            pass
+            #os.system('./siur-players ')
+            #Regra não definida
+
+        if op == 'Menu principal':
+            break
+
+
+
+
+def menu_cenarios():
+    opcoes = [
+        'Escolher local corrente/presente',\
+        'Ver informações do local',\
+        'Modificar informações do local',\
+        'Modificar elemetos/itens do local',\
+        'Modificar personagens/criaturas do local',\
+        'Definir personagem central do local',\
+        'Menu principal'
+        ]
+
+    while True:
+        op = select_op(opcoes, 1, input_label='MENU LOCAIS', clear_screen=True)[0]
+
+        if op == 'Escolher local corrente/presente':
+            os.system('./siur-context set')
+
+        if op == 'Ver informações do local':
+            os.system('./siur-context ?')
+            input()
+
+        if op == 'Modificar informações do local':
+            os.system('./siur-context ')
+
+        if op == 'Modificar elemetos/itens do local':
+            os.system('./siur-context ')
+
+        if op == 'Modificar personagens/criaturas do local':
+            os.system('./siur-context ')
+
+        if op == 'Definir personagem central do local':
+            os.system('./siur-context ')
+
+        if op == 'Menu principal':
+            break
+
+
+def menu_combate():
+    os.system('./siur-combat')
+
+
+def main():
+    minimal_info_check()
+
+
+if __name__ == '__main__':
+	main()

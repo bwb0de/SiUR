@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-mkdbfolders create
+
+Options:
+    --version
+
+"""
+
+import os
+
+from docopt import docopt
+from modules.siur_pastas_de_dados import \
+    pasta_dados,\
+    pasta_personagens,\
+    pasta_equipamentos,\
+    pasta_especialidades,\
+    pasta_cenas,\
+    pasta_cenarios,\
+    pasta_protagonistas,\
+    pasta_antagonistas,\
+    pasta_figurantes,\
+    pasta_criaturas,\
+    pasta_armas_brancas,\
+    pasta_armas_de_fogo,\
+    pasta_armaduras,\
+    pasta_sons_de_fundo,\
+    pasta_sons_fx,\
+    pasta_testes
+
+
+args = docopt(__doc__)
+
+
+def main():
+    if args['create']:
+        os.system('mkdir -p "{}"'.format(pasta_dados))
+        os.system('mkdir -p "{}"'.format(pasta_personagens))
+        os.system('mkdir -p "{}"'.format(pasta_equipamentos))
+        os.system('mkdir -p "{}"'.format(pasta_especialidades))
+        os.system('mkdir -p "{}"'.format(pasta_cenas))
+        os.system('mkdir -p "{}"'.format(pasta_cenarios))
+        os.system('mkdir -p "{}"'.format(pasta_protagonistas))
+        os.system('mkdir -p "{}"'.format(pasta_antagonistas))
+        os.system('mkdir -p "{}"'.format(pasta_figurantes))
+        os.system('mkdir -p "{}"'.format(pasta_criaturas))
+        os.system('mkdir -p "{}"'.format(pasta_armas_brancas))
+        os.system('mkdir -p "{}"'.format(pasta_armas_de_fogo))
+        os.system('mkdir -p "{}"'.format(pasta_armaduras))
+        os.system('mkdir -p "{}"'.format(pasta_sons_de_fundo))
+        os.system('mkdir -p "{}"'.format(pasta_sons_fx))
+        os.system('mkdir -p "{}"'.format(pasta_testes))
+
+
+
+if __name__ == '__main__':
+	main()

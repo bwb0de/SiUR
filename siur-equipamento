@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-equipamento add
+    siur-equipamento list
+
+Options:
+    --version
+
+"""
+
+import os
+
+from docopt import docopt
+from modules.siur_equipamento import ArmaBranca
+from modules.siur_pastas_de_dados import pasta_equipamentos, pasta_protagonistas
+from modules.py_pickle_handlers import load_selected_pickle_ob, return_object_info_and_location_list, read_pickle
+from modules.cli_tools import list_col_responses, dict_from_table, select_op
+
+
+args = docopt(__doc__)
+
+
+def main():
+    if args['add']:
+        ArmaBranca()
+    
+    elif args['list']:
+        equipamento = return_object_info_and_location_list(pasta_equipamentos)
+        equipamento = list(list_col_responses(equipamento, col_num=1, delimitor=';'))
+        for teste in equipamento:
+            teste_obj = read_pickle(teste, pasta_equipamentos)
+            print(teste_obj.info())
+
+
+
+
+
+
+if __name__ == '__main__':
+	main()

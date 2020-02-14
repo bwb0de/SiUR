@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-cenarios add
+    siur-cenarios set
+    siur-cenarios ?
+
+
+Options:
+    --version
+
+"""
+
+import os
+
+from docopt import docopt
+from modules.siur_contexto import Cenario
+from modules.siur_pastas_de_dados import pasta_cenarios, pasta_raiz
+from modules.siur_arquivos_alvo import target_cenario_filename
+from modules.py_pickle_handlers import read_pickle, set_target_pickle_file
+
+args = docopt(__doc__)
+
+
+def main():
+    if args['add']:
+        Cenario()
+    
+    elif args['set']:
+        set_target_pickle_file(pasta_cenarios, target_cenario_filename, pasta_raiz)
+
+
+    elif args['?']:
+        cenario = read_pickle(target_cenario_filename, pasta_raiz)
+        print(cenario)
+        print(cenario.itens_caidos)
+
+
+if __name__ == '__main__':
+	main()

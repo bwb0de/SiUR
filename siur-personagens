@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+#
+#  Copyright 2017 Daniel Cruz <bwb0de@bwb0dePC>
+#  Version 0.1
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#
+#
+
+
+"""
+
+Programa para gestão do combate
+
+Usage:
+    siur-personagens add
+    siur-personagens set
+    siur-personagens ?
+    siur-personagens edit
+    siur-personagens withdraw
+    siur-personagens save    
+    siur-personagens get ( item | $ )
+    siur-personagens buy 
+    siur-personagens sell 
+    siur-personagens give 
+    siur-personagens drop ( from-hands | from-body )
+
+Options:
+    --version
+
+"""
+
+import os
+
+from docopt import docopt
+
+from collections import OrderedDict
+
+from modules.cli_tools import select_op, list_col_responses, dict_from_table, limpar_tela, input_num
+from modules.siur_personagens import Humano, Elfo, Orc, Hobbit, Anao, Vampiro, Lobisomem
+from modules.siur_personagens import lista_de_marcadores, lista_de_ferimentos
+from modules.py_pickle_handlers import show_data_folder, return_object_info_and_location_list, load_selected_pickle_ob, read_pickle, write_pickle, set_target_pickle_file
+from modules.siur_pastas_de_dados import pasta_protagonistas, pasta_equipamentos, pasta_raiz
+from modules.siur_arquivos_alvo import target_character_filename, target_character_fullpath, target_cenario_filename, target_cenario_fullpath
+
+
+args = docopt(__doc__)
+
+def main():
+    if args['add']:
+        papel_no_enredo = select_op(['Protagonistas', 'Antagonistas', 'Figurantes'], 1, input_label="A qual grupo o persongem pertence?")[0]
+        if papel_no_enredo == 'Protagonistas':
+            jogador = input('Jogador: ')
+        else:
+            jogador = False
+        
+        op = select_op(['Humano', 'Elfo', 'Orc', 'Hobbit', 'Anão', 'Vampiro', 'Lobisomem'], 1, input_label='Selecione o tipo do personagem:', clear_screen=False)
+        if op == ['Humano']:
+            Humano(papel_no_enredo, jogador)
+        elif op == ['Elfo']:
+            Elfo(papel_no_enredo, jogador)
+        elif op == ['Orc']:
+            Orc(papel_no_enredo, jogador)
+        elif op == ['Hobbit']:
+            Hobbit(papel_no_enredo, jogador)
+        elif op == ['Anão']:
+            Anao(papel_no_enredo, jogador)
+        elif op == ['Vampiro']:
+            Vampiro(papel_no_enredo, jogador)
+        elif op == ['Lobisomem']:
+            Lobisomem(papel_no_enredo, jogador)
+    
+
+    elif args['set']:
+        set_target_pickle_file(pasta_protagonistas, target_character_filename, pasta_raiz)
+
+    elif args['?']:
+        protagonista = read_pickle(target_character_fullpath)
+        protagonista.mostrar_estado()
+
+    elif args['edit']:
+        protagonista = read_pickle(target_character_fullpath)
+        tipo_marcador = select_op(['Ferimentos', 'Elos', 'Marcadores de Estado'], 1, input_label="Qual categoria?")[0]
+
+        if tipo_marcador == 'Elos':
+            protagonista.adicionar_elos()
+        
+        elif tipo_marcador == 'Marcadores de Estado':
+            marcador = select_op(lista_de_marcadores, 1, input_label='Marcadores de Estado:')[0]
+            quantidade = input_num('Valor a ser adicionado/subtraído: ')
+            protagonista.modificar_marcadores(marcador, quantidade)
+
+        elif tipo_marcador == 'Ferimentos':
+            marcador = select_op(lista_de_ferimentos, 1, input_label='Tipos de ferimento:')[0]
+            quantidade = input_num('Valor a ser adicionado/subtraído: ')
+            protagonista.modificar_marcadores(marcador, quantidade)
+
+
+    elif args['get']:
+        if args['item']:
+            
+            protagonista = read_pickle(target_character_fullpath)
+            local = read_pickle(target_cenario_fullpath)
+            protagonista.pegar_item_do_cenario(local)
+            
+            '''equipamentos = load_selected_pickle_ob("Selecione o objeto: ", pasta_equipamentos)
+            for equipamento in equipamentos:
+                protagonista.incluir_item_no_inventario(equipamento)'''
+        
+        elif args['$']:
+            protagonista = read_pickle(target_character_fullpath)
+            protagonista.incluir_dinheiro_no_inventario(input_num('Quantidade de recursos: '))
+
+
+    elif args['buy']:
+        protagonista = read_pickle(target_character_fullpath)
+        equipamentos = load_selected_pickle_ob("Selecione o objeto: ", pasta_equipamentos)
+        for equipamento in equipamentos:
+            protagonista.comprar_item(equipamento)
+            
+
+    elif args['sell']:
+        pass
+        # Necessário definir métodos no objeto...
+
+    elif args['give']:
+        protagonista = read_pickle(target_character_fullpath)
+        personagem_alvo = list(load_selected_pickle_ob("Selecione apenas um personagem: ", pasta_protagonistas))[0]
+        if protagonista.nome == personagem_alvo.nome:
+            print('Você não pode transferir a arma para a mesma pessoa...')
+            exit()
+        protagonista.passar_item_para_outro_personagem(personagem_alvo)
+        
+
+    elif args['drop']:
+        protagonista = read_pickle(target_character_fullpath)
+        local = read_pickle(target_cenario_fullpath)
+
+        if args['from-hands']:
+            itens_caidos = protagonista.largar_item_das_maos_no_chao()
+            for item in itens_caidos:
+                local.registrar_itens_caidos(item)
+        
+        elif args['from-body']:
+            itens_caidos = protagonista.deixar_item_do_inventario_no_chao()
+            for item in itens_caidos:
+                local.registrar_itens_caidos(item)
+            
+            
+    elif args['save']:
+        protagonista = read_pickle(target_character_fullpath)
+        protagonista.guardar_armas()            
+
+    elif args['withdraw']:
+        protagonista = read_pickle(target_character_fullpath)
+        protagonista.usar_arma()
+
+
+
+if __name__ == '__main__':
+	main()
